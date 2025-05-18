@@ -22,7 +22,8 @@ st.markdown("Generate stunning images using **Hugging Face's Stable Diffusion AI
 # Hugging Face API Settings
 # -----------------------------
 API_TOKEN = "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"  # ✅ Your token inserted here
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
+API_URL  = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
+
 
 HEADERS = {
     "Authorization": f"Bearer {API_TOKEN}",
