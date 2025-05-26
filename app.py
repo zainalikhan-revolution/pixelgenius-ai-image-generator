@@ -8,7 +8,6 @@ from PIL import Image, ImageEnhance
 from io import BytesIO
 import zipfile
 import base64
-import os
 
 # -----------------------------
 # Config and Branding
@@ -67,48 +66,38 @@ def get_image_download_link(img_list):
 # Sidebar UI
 # -----------------------------
 st.sidebar.header("🛠️ Generator Settings")
-prompt = st.sidebar.text_input("Enter your image description:")
-style = st.sidebar.selectbox("Choose style:", ["Realistic", "3D Art", "Cartoon", "Digital Painting"])
-num_images = st.sidebar.selectbox("Number of images:", [1, 2, 3, 4])
-generate_button = st.sidebar.button("Generate")
 
-st.sidebar.markdown("---")
-st.sidebar.header("🎛️ Filters")
+prompt = st.sidebar.text_input("Enter your image description:")
+style = st.sidebar.selectbox("Choose style:", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
+num_images = st.sidebar.slider("Number of images:", 1, 4, 1)
+
+st.sidebar.markdown("### 🎛️ Filters")
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0)
 contrast = st.sidebar.slider("Contrast", 0.5, 2.0, 1.0)
 sharpness = st.sidebar.slider("Sharpness", 0.5, 2.0, 1.0)
 
+generate = st.sidebar.button("🎨 Generate")
+
 # -----------------------------
-# Image Generation and Display
+# Main UI
 # -----------------------------
-if generate_button:
+if generate:
     if not prompt:
-        st.warning("Please enter a prompt first.")
+        st.warning("❗ Please enter a prompt.")
     else:
-        final_prompt = f"{prompt}, {style} style"
-        st.subheader("🖼️ Generated Images")
-        with st.spinner("Generating images..."):
-            columns = st.columns(num_images)
-            session_images = []
-            for i in range(num_images):
-                img = generate_image(final_prompt)
-                if img:
-                    filtered_img = apply_filters(img, brightness, contrast, sharpness)
-                    columns[i].image(filtered_img, use_column_width=True, caption=f"Image {i+1}")
-                    session_images.append(filtered_img)
+        images = []
+        with st.spinner("🚀 Generating images..."):
+            for _ in range(num_images):
+                image = generate_image(f"{style} style - {prompt}")
+                if image:
+                    filtered_image = apply_filters(image, brightness, contrast, sharpness)
+                    images.append(filtered_image)
 
-            if session_images:
-                st.markdown(get_image_download_link(session_images), unsafe_allow_html=True)
-                st.session_state["history"] = session_images
+        for img in images:
+            st.image(img, use_column_width=True)
 
-# -----------------------------
-# Image History (Session)
-# -----------------------------
-if "history" in st.session_state:
-    st.markdown("---")
-    st.subheader("🕘 Image History")
-    cols = st.columns(len(st.session_state["history"]))
-    for idx, img in enumerate(st.session_state["history"]):
-        cols[idx].image(img, caption=f"Previous Image {idx+1}", use_column_width=True)
+        st.markdown(get_image_download_link(images), unsafe_allow_html=True)
+
+
 
 
