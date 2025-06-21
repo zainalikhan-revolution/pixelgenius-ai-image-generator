@@ -38,12 +38,9 @@ client = replicate.Client(api_token=REPLICATE_TOKEN)
 # -----------------------------
 def generate_image(prompt):
     try:
-        # ✅ Correct model and version
-        model = "stability-ai/sdxl"
-        version = "db21e45e40f6520ce4c8d6d0a82c6c655b012f4f19224860fdf3a5b8b6d103e4"
-
+        # ✅ Updated with known working version
         output = client.run(
-            f"{model}:{version}",
+            "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
             input={
                 "prompt": prompt,
                 "width": 1024,
@@ -52,10 +49,10 @@ def generate_image(prompt):
         )
         response = requests.get(output[0])
         return Image.open(BytesIO(response.content))
-
     except Exception as e:
         st.error(f"❌ Image generation failed: {e}")
         return None
+
 
 def apply_filters(img, brightness, contrast, sharpness):
     img = ImageEnhance.Brightness(img).enhance(brightness)
