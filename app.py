@@ -26,7 +26,7 @@ st.divider()
 # -----------------------------
 # Hugging Face API Token Setup
 # -----------------------------
-HF_API_TOKEN = st.secrets["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"]  # 👈 Add your token in secrets.toml
+HF_API_TOKEN = st.secrets[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]  # 👈 Add your token in secrets.toml
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 HEADERS = {"Authorization": f"Bearer {HF_API_TOKEN}"}
 
