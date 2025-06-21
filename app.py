@@ -1,14 +1,13 @@
 # -----------------------------------------------
-# PixelGenius - Phase 4+ Enhanced Version (Replicate)
+# PixelGenius - Hugging Face Version (100% Free)
 # -----------------------------------------------
 
 import streamlit as st
-import replicate
+import requests
 from PIL import Image, ImageEnhance
 from io import BytesIO
 import zipfile
 import base64
-import requests
 
 # -----------------------------
 # Config and Branding
@@ -19,40 +18,29 @@ st.set_page_config(
     layout="wide"
 )
 
-# -----------------------------
-# Logo and Description
-# -----------------------------
 st.image("assets/logo.png", width=140)
 st.title("🎨 PixelGenius: AI Image Generator")
-st.caption("Create high-quality images using Stable Diffusion XL with real-time filters, style previews, and multi-image generation.")
+st.caption("Create high-quality images using Hugging Face Stable Diffusion XL (Free API) with real-time filters and styles.")
 st.divider()
 
 # -----------------------------
-# Replicate API Setup
+# Hugging Face API Setup
 # -----------------------------
-REPLICATE_TOKEN = st.secrets["REPLICATE_API_TOKEN"]
-client = replicate.Client(api_token=REPLICATE_TOKEN)
+API_TOKEN = st.secrets["HF_API_TOKEN"]
+API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
 
 # -----------------------------
 # Utility Functions
 # -----------------------------
 def generate_image(prompt):
-    try:
-        # ✅ Updated with known working version
-        output = client.run(
-            "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-            input={
-                "prompt": prompt,
-                "width": 1024,
-                "height": 1024
-            }
-        )
-        response = requests.get(output[0])
+    payload = {"inputs": prompt, "options": {"wait_for_model": True}}
+    response = requests.post(API_URL, headers=HEADERS, json=payload)
+    if response.status_code == 200:
         return Image.open(BytesIO(response.content))
-    except Exception as e:
-        st.error(f"❌ Image generation failed: {e}")
+    else:
+        st.error(f"❌ API Error {response.status_code}: {response.text}")
         return None
-
 
 def apply_filters(img, brightness, contrast, sharpness):
     img = ImageEnhance.Brightness(img).enhance(brightness)
@@ -77,7 +65,7 @@ def get_image_download_link(img_list):
 # -----------------------------
 st.sidebar.header("🧠 Generator Controls")
 style = st.sidebar.selectbox("🎨 Choose Style", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
-num_images = st.sidebar.slider("🖼️ Number of Images", 1, 4, 1)
+num_images = st.sidebar.slider("🖼️ Number of Images", 1, 2, 1)  # Limit to 2 max (free tier safe)
 
 st.sidebar.markdown("### 🎛️ Filters")
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0)
@@ -100,8 +88,7 @@ if prompt:
 
         with st.spinner("Generating..."):
             for _ in range(num_images):
-                styled_prompt = f"{style} style - {prompt}"
-                img = generate_image(styled_prompt)
+                img = generate_image(f"{style} style - {prompt}")
                 if img:
                     filtered_img = apply_filters(img, brightness, contrast, sharpness)
                     images.append(filtered_img)
@@ -115,12 +102,13 @@ if prompt:
                     st.image(img, caption=f"Image {i+1}", use_column_width="always")
             st.markdown(get_image_download_link(images), unsafe_allow_html=True)
         else:
-            st.warning("⚠️ No images were generated. Please check your API credits or try again with a different prompt.")
+            st.warning("⚠️ No images were generated. Try another prompt or check API status.")
 
         st.divider()
         st.markdown("### 🕘 Prompt History")
         for i, p in enumerate(reversed(history[-5:]), 1):
             st.markdown(f"{i}. _{p}_")
+
 else:
     st.info("👈 Enter a prompt above to start generating images.")
 
