@@ -1,5 +1,5 @@
 # -----------------------------------------------
-# PixelGenius - Full Updated Version (Phase 2, 3, and 4)
+# PixelGenius - Phase 4+ Enhanced Version
 # -----------------------------------------------
 
 import streamlit as st
@@ -19,21 +19,23 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Branding - Logo and Title
+# Logo and Description
 # -----------------------------
-st.image("assets/logo.png", width=150)
+st.image("assets/logo.png", width=140)
 st.title("🎨 PixelGenius: AI Image Generator")
-st.markdown("Generate high-quality images using **Stable Diffusion XL** with filters, download options, and history.")
+st.caption("Create high-quality images using Stable Diffusion XL with real-time filters, style previews, and multi-image generation.")
+
+st.divider()
 
 # -----------------------------
-# Hugging Face API Setup
+# Hugging Face API
 # -----------------------------
 API_TOKEN = st.secrets["HF_API_TOKEN"]
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
 HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
 
 # -----------------------------
-# Utilities
+# Utility Functions
 # -----------------------------
 def generate_image(prompt):
     payload = {"inputs": prompt, "options": {"wait_for_model": True}}
@@ -63,40 +65,55 @@ def get_image_download_link(img_list):
     return href
 
 # -----------------------------
-# Sidebar UI
+# Sidebar Settings
 # -----------------------------
-st.sidebar.header("🛠️ Generator Settings")
-
-prompt = st.sidebar.text_input("Enter your image description:")
-style = st.sidebar.selectbox("Choose style:", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
-num_images = st.sidebar.slider("Number of images:", 1, 4, 1)
+st.sidebar.header("🧠 Generator Controls")
+style = st.sidebar.selectbox("🎨 Choose Style", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
+num_images = st.sidebar.slider("🖼️ Number of Images", 1, 4, 1)
 
 st.sidebar.markdown("### 🎛️ Filters")
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0)
 contrast = st.sidebar.slider("Contrast", 0.5, 2.0, 1.0)
 sharpness = st.sidebar.slider("Sharpness", 0.5, 2.0, 1.0)
 
-generate = st.sidebar.button("🎨 Generate")
+# -----------------------------
+# Main Prompt + UI
+# -----------------------------
+st.markdown("### ✏️ Enter your prompt")
+prompt = st.text_input("For example: *A futuristic city at sunset, in anime style*")
 
-# -----------------------------
-# Main UI
-# -----------------------------
-if generate:
-    if not prompt:
-        st.warning("❗ Please enter a prompt.")
-    else:
+if prompt:
+    if st.button("🚀 Generate Images"):
+        st.info(f"Generating {num_images} image(s) with **{style}** style...")
         images = []
-        with st.spinner("🚀 Generating images..."):
-            for _ in range(num_images):
-                image = generate_image(f"{style} style - {prompt}")
-                if image:
-                    filtered_image = apply_filters(image, brightness, contrast, sharpness)
-                    images.append(filtered_image)
+        history = st.session_state.get("prompt_history", [])
+        history.append(prompt)
+        st.session_state.prompt_history = history
 
-        for img in images:
-            st.image(img, use_column_width=True)
+        with st.spinner("Generating..."):
+            for _ in range(num_images):
+                img = generate_image(f"{style} style - {prompt}")
+                if img:
+                    filtered_img = apply_filters(img, brightness, contrast, sharpness)
+                    images.append(filtered_img)
+
+        st.success("✅ Done!")
+        cols = st.columns(len(images))
+        for i, img in enumerate(images):
+            with cols[i]:
+                st.image(img, caption=f"Image {i+1}", use_column_width="always")
 
         st.markdown(get_image_download_link(images), unsafe_allow_html=True)
+        st.divider()
+
+        st.markdown("### 🕘 Prompt History")
+        for i, p in enumerate(reversed(history[-5:]), 1):
+            st.markdown(f"{i}. _{p}_")
+
+else:
+    st.info("👈 Enter a prompt above to start generating images.")
+
+
 
 
 
