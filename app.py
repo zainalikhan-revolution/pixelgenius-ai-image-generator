@@ -40,7 +40,7 @@ client = replicate.Client(api_token=REPLICATE_TOKEN)
 def generate_image(prompt):
     try:
         output = client.run(
-            "stability-ai/sdxl:latest",
+            "stability-ai/stable-diffusion-xl",  # ✅ Fixed model name
             input={
                 "prompt": prompt,
                 "width": 1024,
@@ -106,20 +106,25 @@ if prompt:
                     images.append(filtered_img)
 
         st.success("✅ Done!")
-        cols = st.columns(len(images))
-        for i, img in enumerate(images):
-            with cols[i]:
-                st.image(img, caption=f"Image {i+1}", use_column_width="always")
 
-        st.markdown(get_image_download_link(images), unsafe_allow_html=True)
+        # ✅ Prevent crash if no images
+        if images:
+            cols = st.columns(len(images))
+            for i, img in enumerate(images):
+                with cols[i]:
+                    st.image(img, caption=f"Image {i+1}", use_column_width="always")
+            st.markdown(get_image_download_link(images), unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ No images were generated. Please check your API credits or try again with a different prompt.")
+
         st.divider()
-
         st.markdown("### 🕘 Prompt History")
         for i, p in enumerate(reversed(history[-5:]), 1):
             st.markdown(f"{i}. _{p}_")
 
 else:
     st.info("👈 Enter a prompt above to start generating images.")
+
 
 
 
