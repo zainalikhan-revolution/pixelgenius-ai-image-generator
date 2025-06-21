@@ -1,5 +1,5 @@
 # -----------------------------------------------
-# PixelGenius - Hugging Face Version (100% Free)
+# PixelGenius - Hugging Face Version (Free & Fixed)
 # -----------------------------------------------
 
 import streamlit as st
@@ -65,7 +65,7 @@ def get_image_download_link(img_list):
 # -----------------------------
 st.sidebar.header("🧠 Generator Controls")
 style = st.sidebar.selectbox("🎨 Choose Style", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
-num_images = st.sidebar.slider("🖼️ Number of Images", 1, 2, 1)  # Limit to 2 max (free tier safe)
+num_images = st.sidebar.slider("🖼️ Number of Images", 1, 2, 1)  # Max 2 for free plan safety
 
 st.sidebar.markdown("### 🎛️ Filters")
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0)
