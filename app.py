@@ -25,7 +25,6 @@ st.set_page_config(
 st.image("assets/logo.png", width=140)
 st.title("🎨 PixelGenius: AI Image Generator")
 st.caption("Create high-quality images using Stable Diffusion XL with real-time filters, style previews, and multi-image generation.")
-
 st.divider()
 
 # -----------------------------
@@ -39,8 +38,12 @@ client = replicate.Client(api_token=REPLICATE_TOKEN)
 # -----------------------------
 def generate_image(prompt):
     try:
+        # ✅ Correct working model + version
+        model = "stability-ai/sdxl"
+        version = "db21e45e40f6520ce4c8d6d0a82c6c655b012f4f19224860fdf3a5b8b6d103e4"
+
         output = client.run(
-            "stability-ai/stable-diffusion-xl",  # ✅ Fixed model name
+            f"{model}:{version}",
             input={
                 "prompt": prompt,
                 "width": 1024,
@@ -49,8 +52,9 @@ def generate_image(prompt):
         )
         response = requests.get(output[0])
         return Image.open(BytesIO(response.content))
+
     except Exception as e:
-        st.error(f"Image generation failed: {e}")
+        st.error(f"❌ Image generation failed: {e}")
         return None
 
 def apply_filters(img, brightness, contrast, sharpness):
@@ -107,7 +111,6 @@ if prompt:
 
         st.success("✅ Done!")
 
-        # ✅ Prevent crash if no images
         if images:
             cols = st.columns(len(images))
             for i, img in enumerate(images):
