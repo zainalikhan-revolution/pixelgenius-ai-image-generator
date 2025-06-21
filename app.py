@@ -23,12 +23,7 @@ st.title("🎨 PixelGenius: AI Image Generator")
 st.caption("Create high-quality images using Hugging Face Stable Diffusion XL (Free API) with real-time filters and styles.")
 st.divider()
 
-# -----------------------------
-# Hugging Face API Setup
-# -----------------------------
-API_TOKEN = st.secrets["HF_API_TOKEN"]
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
+
 
 # -----------------------------
 # Utility Functions
