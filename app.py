@@ -38,7 +38,7 @@ client = replicate.Client(api_token=REPLICATE_TOKEN)
 # -----------------------------
 def generate_image(prompt):
     try:
-        # ✅ Correct working model + version
+        # ✅ Correct model and version
         model = "stability-ai/sdxl"
         version = "db21e45e40f6520ce4c8d6d0a82c6c655b012f4f19224860fdf3a5b8b6d103e4"
 
@@ -124,9 +124,9 @@ if prompt:
         st.markdown("### 🕘 Prompt History")
         for i, p in enumerate(reversed(history[-5:]), 1):
             st.markdown(f"{i}. _{p}_")
-
 else:
     st.info("👈 Enter a prompt above to start generating images.")
+
 
 
 
