@@ -24,7 +24,7 @@ st.caption("Create high-quality images using Hugging Face Stable Diffusion XL (F
 st.divider()
 
 
-
+HF_API_TOKEN = "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"
 # -----------------------------
 # Utility Functions
 # -----------------------------
