@@ -1,13 +1,14 @@
 # -----------------------------------------------
-# PixelGenius - Phase 4+ Enhanced Version
+# PixelGenius - Phase 4+ Enhanced Version (Replicate)
 # -----------------------------------------------
 
 import streamlit as st
-import requests
+import replicate
 from PIL import Image, ImageEnhance
 from io import BytesIO
 import zipfile
 import base64
+import requests
 
 # -----------------------------
 # Config and Branding
@@ -28,22 +29,28 @@ st.caption("Create high-quality images using Stable Diffusion XL with real-time 
 st.divider()
 
 # -----------------------------
-# Hugging Face API
+# Replicate API Setup
 # -----------------------------
-API_TOKEN = st.secrets["HF_API_TOKEN"]
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
+REPLICATE_TOKEN = st.secrets["REPLICATE_API_TOKEN"]
+client = replicate.Client(api_token=REPLICATE_TOKEN)
 
 # -----------------------------
 # Utility Functions
 # -----------------------------
 def generate_image(prompt):
-    payload = {"inputs": prompt, "options": {"wait_for_model": True}}
-    response = requests.post(API_URL, headers=HEADERS, json=payload)
-    if response.status_code == 200:
+    try:
+        output = client.run(
+            "stability-ai/sdxl:latest",
+            input={
+                "prompt": prompt,
+                "width": 1024,
+                "height": 1024
+            }
+        )
+        response = requests.get(output[0])
         return Image.open(BytesIO(response.content))
-    else:
-        st.error(f"API Error {response.status_code}: {response.text}")
+    except Exception as e:
+        st.error(f"Image generation failed: {e}")
         return None
 
 def apply_filters(img, brightness, contrast, sharpness):
@@ -92,7 +99,8 @@ if prompt:
 
         with st.spinner("Generating..."):
             for _ in range(num_images):
-                img = generate_image(f"{style} style - {prompt}")
+                styled_prompt = f"{style} style - {prompt}"
+                img = generate_image(styled_prompt)
                 if img:
                     filtered_img = apply_filters(img, brightness, contrast, sharpness)
                     images.append(filtered_img)
@@ -112,6 +120,7 @@ if prompt:
 
 else:
     st.info("👈 Enter a prompt above to start generating images.")
+
 
 
 
