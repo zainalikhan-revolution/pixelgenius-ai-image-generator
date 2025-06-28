@@ -1,5 +1,5 @@
 # -----------------------------------------------
-# PixelGenius - Hugging Face Secure Version
+# PixelGenius - Fixed & Working Version
 # -----------------------------------------------
 
 import streamlit as st
@@ -26,12 +26,15 @@ st.divider()
 # -----------------------------
 # Load API Token from Streamlit Secrets
 # -----------------------------
-api_token = st.secrets["huggingface"]["api_token"]  # ✅ Secure method
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1"
+try:
+    api_token = st.secrets["HUGGINGFACE_TOKEN"]  # ✅ Updated key name
+    API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"  # ✅ Updated model
+    HEADERS = {"Authorization": f"Bearer {api_token}"}
+except KeyError:
+    st.error("🔴 API Token not found! Did you add it to Streamlit Secrets?")
+    st.stop()
 
 
-
-HEADERS = {"Authorization": f"Bearer {api_token}"}
 
 # -----------------------------
 # Utility Functions
