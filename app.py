@@ -27,7 +27,8 @@ st.divider()
 # Load API Token from Streamlit Secrets
 # -----------------------------
 api_token = st.secrets["huggingface"]["api_token"]  # ✅ Secure method
-API_URL = "API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4"
+API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4"
+
 
 HEADERS = {"Authorization": f"Bearer {api_token}"}
 
