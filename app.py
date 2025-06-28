@@ -1,5 +1,5 @@
 # -----------------------------------------------
-# PixelGenius - Hugging Face Version (Secure & Fixed)
+# PixelGenius - Hugging Face Secure Version
 # -----------------------------------------------
 
 import streamlit as st
@@ -23,6 +23,12 @@ st.title("🎨 PixelGenius: AI Image Generator")
 st.caption("Create high-quality images using Hugging Face Stable Diffusion XL (Free API) with real-time filters and styles.")
 st.divider()
 
+# -----------------------------
+# Load API Token from Streamlit Secrets
+# -----------------------------
+api_token = st.secrets["huggingface"]["api_token"]  # ✅ Secure method
+API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
+HEADERS = {"Authorization": f"Bearer {api_token}"}
 
 # -----------------------------
 # Utility Functions
@@ -59,7 +65,7 @@ def get_image_download_link(img_list):
 # -----------------------------
 st.sidebar.header("🧠 Generator Controls")
 style = st.sidebar.selectbox("🎨 Choose Style", ["Realistic", "Anime", "Sketch", "Cyberpunk"])
-num_images = st.sidebar.slider("🖼️ Number of Images", 1, 2, 1)  # Limit for free plan
+num_images = st.sidebar.slider("🖼️ Number of Images", 1, 2, 1)  # Keep 1–2 for free tier
 
 st.sidebar.markdown("### 🎛️ Filters")
 brightness = st.sidebar.slider("Brightness", 0.5, 2.0, 1.0)
@@ -67,7 +73,7 @@ contrast = st.sidebar.slider("Contrast", 0.5, 2.0, 1.0)
 sharpness = st.sidebar.slider("Sharpness", 0.5, 2.0, 1.0)
 
 # -----------------------------
-# Main Prompt + UI
+# Main UI
 # -----------------------------
 st.markdown("### ✏️ Enter your prompt")
 prompt = st.text_input("For example: *A futuristic city at sunset, in anime style*")
